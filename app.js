@@ -280,41 +280,127 @@ function switchStore(storeKey) {
   const off = "py-2.5 px-2 rounded-xl font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 transition text-slate-400 hover:text-slate-200";
   document.getElementById('tabPxmart').className = storeKey === 'pxmart' ? on('bg-blue-600') : off;
   document.getElementById('tabCarrefour').className = storeKey === 'carrefour' ? on('bg-red-600') : off;
-  renderChecklist(); updateNavigationButtons(); calculatePerPerson();
+  renderChecklist(); updateNavigationButtons(); updateSubtotal(true); calculatePerPerson();
 }
 
+/* ---------- v2: thumbnails, staff card, real prices, custom items ---------- */
+Object.assign(I18N.zh, { price_ph: "金額", subtotal: "已填商品金額小計", add_item: "新增自訂項目", custom_cat: "➕ 自訂項目", custom_ph: "品名（例如：冰塊）",
+  img_btn: "看圖片", staff_btn: "問店員", staff_close: "關閉", bill_auto: "※ 清單中有填金額時，發票總額會自動帶入小計；也可以直接手動修改。",
+  zh_hint: "💡 每個品項可以填入賣場實際金額；找不到商品時按「問店員」把畫面拿給店員看。" });
+Object.assign(I18N.en, { price_ph: "price", subtotal: "Subtotal of prices entered", add_item: "Add your own item", custom_cat: "➕ Your own items", custom_ph: "Item name (e.g. ice)",
+  img_btn: "Photos", staff_btn: "Ask staff", staff_close: "Close", bill_auto: "※ When you enter item prices, the receipt total is filled in automatically with the subtotal. You can still edit it by hand.",
+  zh_hint: "💡 Type the real shelf price for each item. Can't find something? Tap “Ask staff” and show the screen to a store employee. The small grey Chinese text is the name on the shelf label." });
+Object.assign(I18N.vi, { price_ph: "giá", subtotal: "Tạm tính các giá đã nhập", add_item: "Thêm món của bạn", custom_cat: "➕ Món tự thêm", custom_ph: "Tên món (ví dụ: đá viên)",
+  img_btn: "Xem ảnh", staff_btn: "Hỏi nhân viên", staff_close: "Đóng", bill_auto: "※ Khi bạn nhập giá từng món, tổng hóa đơn sẽ tự điền bằng số tạm tính. Bạn vẫn có thể sửa bằng tay.",
+  zh_hint: "💡 Nhập giá thật trên kệ cho từng món. Không tìm thấy? Bấm “Hỏi nhân viên” rồi đưa màn hình cho nhân viên siêu thị xem. Dòng chữ Trung màu xám là tên trên nhãn kệ hàng." });
+
+const EMOJI = { px_m1:"🥩", px_m2:"🍗", px_m3:"🥓", px_m4:"🦐", px_v1:"🌽", px_v2:"🎋", px_v3:"🍄", px_v4:"🍞", px_s1:"🍵", px_s2:"🥤", px_s3:"🧴", px_s4:"🧻",
+  px_t1:"♨️", px_t2:"⚫", px_t3:"🕸️", px_t4:"🥢", px_t5:"🔥", px_t6:"🗑️", px_t7:"🍽️",
+  cf_m1:"🥩", cf_m2:"🥓", cf_m3:"🌭", cf_m4:"🦐", cf_m5:"🦑", cf_v1:"🥒", cf_v2:"🫑", cf_v3:"🍢", cf_v4:"🍞", cf_s1:"🧴", cf_s2:"🧂", cf_s3:"🧊", cf_s4:"🍵",
+  cf_t1:"♨️", cf_t2:"🥥", cf_t3:"🕸️", cf_t4:"✂️", cf_t5:"🔥", cf_t6:"🗑️", cf_t7:"🍽️" };
+const PRICE_KEY = 'moon_bbq_prices_v1', CUSTOM_KEY = 'moon_bbq_custom_v1';
+const getJSON = (k) => { try { return JSON.parse(lsGet(k, '{}')) || {}; } catch (e) { return {}; } };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const getCustom = () => (getJSON(CUSTOM_KEY)[currentStore] || []);
+function setCustom(list) { const all = getJSON(CUSTOM_KEY); all[currentStore] = list; lsSet(CUSTOM_KEY, JSON.stringify(all)); }
+const STAFF_STORE = { pxmart: "全聯", carrefour: "家樂福" };
+const priceBox = (id, val, ph) => `<span class="ml-auto flex items-center gap-1 text-slate-400 text-xs shrink-0">$<input type="number" inputmode="numeric" min="0" value="${val ?? ''}" placeholder="${ph}" oninput="setPrice('${id}', this.value)" class="w-16 bg-slate-950 border border-slate-700 rounded-lg py-1 px-2 text-right text-white text-xs focus:outline-none focus:border-amber-400"></span>`;
+const miniBtn = "px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] text-slate-200 active:scale-95 whitespace-nowrap";
+
 function renderChecklist() {
-  const plan = storePlans[currentStore];
-  const saved = getStoredChecks();
+  const plan = storePlans[currentStore], saved = getStoredChecks(), prices = getJSON(PRICE_KEY);
   document.getElementById('storeName').textContent = plan.title[lang];
   document.getElementById('storeAdvantage').textContent = plan.advantage[lang];
   const badge = document.getElementById('storeBadge');
   badge.textContent = plan.badge[lang];
   badge.className = "px-2 py-0.5 rounded text-xs font-bold border " + (currentStore === 'pxmart' ? "bg-blue-500/20 text-blue-300 border-blue-500/40" : "bg-red-500/20 text-red-300 border-red-500/40");
 
-  let total = 0, done = 0, html = '';
+  let html = '';
   plan.sections.forEach(sec => {
     html += `<div class="space-y-2"><div class="text-xs font-bold text-amber-300 tracking-wider">${sec.category[lang]}</div><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">`;
     sec.items.forEach(item => {
-      total++; const c = !!saved[item.id]; if (c) done++;
+      const c = !!saved[item.id];
       const sub = lang === 'zh' ? '' : `<span class="block text-[11px] font-normal text-slate-500 mt-0.5">${item.zh}</span>`;
-      html += `<label class="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-800/80 bg-slate-900/60 hover:bg-slate-800/80 cursor-pointer transition select-none text-xs sm:text-sm">
-        <input type="checkbox" onchange="toggleItem('${item.id}', this.checked)" ${c ? 'checked' : ''} class="w-4 h-4 mt-0.5 shrink-0 accent-amber-500 cursor-pointer">
-        <span class="${c ? 'line-through text-slate-500 font-normal' : 'text-slate-200 font-medium'}">${item[lang]}${sub}</span></label>`;
+      const hint = (item.zh.match(/\$(\d+)/) || [])[1] || T().price_ph;
+      const q = encodeURIComponent(STAFF_STORE[currentStore] + ' ' + item.zh.replace(/\s*[\(（][^)）]*[\)）]/g, '').replace(/\$\d+/g, ''));
+      html += `<div class="p-2.5 rounded-xl border border-slate-800/80 bg-slate-900/60 text-xs sm:text-sm">
+        <label class="flex items-start gap-2.5 cursor-pointer select-none">
+          <input type="checkbox" onchange="toggleItem('${item.id}', this.checked)" ${c ? 'checked' : ''} class="w-4 h-4 mt-1 shrink-0 accent-amber-500 cursor-pointer">
+          <span class="w-9 h-9 shrink-0 rounded-lg bg-slate-800 flex items-center justify-center text-xl" aria-hidden="true">${EMOJI[item.id] || '🛒'}</span>
+          <span class="${c ? 'line-through text-slate-500 font-normal' : 'text-slate-200 font-medium'}">${item[lang]}${sub}</span>
+        </label>
+        <div class="flex flex-wrap items-center gap-1.5 mt-2">
+          <a href="https://www.google.com/search?tbm=isch&q=${q}" target="_blank" rel="noopener" class="${miniBtn}">🔍 ${T().img_btn}</a>
+          <button type="button" onclick="showStaffCard('${item.id}')" class="${miniBtn}">🙋 ${T().staff_btn}</button>
+          ${priceBox(item.id, prices[item.id], hint)}
+        </div></div>`;
     });
     html += `</div></div>`;
   });
+
+  html += `<div class="space-y-2"><div class="text-xs font-bold text-amber-300 tracking-wider">${T().custom_cat}</div><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">`;
+  getCustom().forEach(ci => {
+    const c = !!saved[ci.id];
+    html += `<div class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-800/80 bg-slate-900/60 text-xs sm:text-sm">
+      <input type="checkbox" onchange="toggleItem('${ci.id}', this.checked)" ${c ? 'checked' : ''} class="w-4 h-4 shrink-0 accent-amber-500 cursor-pointer">
+      <input type="text" value="${esc(ci.name)}" placeholder="${esc(T().custom_ph)}" onchange="renameCustom('${ci.id}', this.value)" class="min-w-0 flex-1 bg-slate-950 border border-slate-700 rounded-lg py-1 px-2 text-white text-xs focus:outline-none focus:border-amber-400 ${c ? 'line-through text-slate-500' : ''}">
+      ${priceBox(ci.id, prices[ci.id], T().price_ph)}
+      <button type="button" onclick="removeCustom('${ci.id}')" aria-label="delete" class="shrink-0 w-7 h-7 rounded-lg bg-slate-800 hover:bg-red-600 text-slate-300">✕</button></div>`;
+  });
+  html += `</div><button type="button" onclick="addCustom()" class="w-full py-2.5 rounded-xl border border-dashed border-slate-600 text-slate-300 hover:border-amber-400 hover:text-amber-300 text-xs font-semibold active:scale-95">＋ ${T().add_item}</button></div>
+    <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/90 border border-night-border text-xs"><span class="text-slate-400">${T().subtotal}</span><span id="itemSubtotal" class="font-black text-amber-300 text-base">$ 0</span></div>
+    <p class="text-[11px] text-slate-500">${T().bill_auto}</p>`;
   document.getElementById('checklistContainer').innerHTML = html;
-  const pct = total ? Math.round(done / total * 100) : 0;
-  document.getElementById('progressBar').style.width = pct + '%';
-  document.getElementById('progressPercent').textContent = `${pct}% (${done}/${total} ${T().unit})`;
+  updateProgress(); updateSubtotal(false);
 }
+
+function allIds() { const ids = []; storePlans[currentStore].sections.forEach(s => s.items.forEach(i => ids.push(i.id))); getCustom().forEach(c => ids.push(c.id)); return ids; }
+function updateProgress() {
+  const saved = getStoredChecks(), ids = allIds(), done = ids.filter(i => saved[i]).length;
+  const pct = ids.length ? Math.round(done / ids.length * 100) : 0;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressPercent').textContent = `${pct}% (${done}/${ids.length} ${T().unit})`;
+}
+function updateSubtotal(sync) {
+  const prices = getJSON(PRICE_KEY); let sum = 0;
+  allIds().forEach(i => { sum += Number(prices[i]) || 0; });
+  const el = document.getElementById('itemSubtotal'); if (el) el.textContent = `$ ${sum.toLocaleString('en-US')}`;
+  if (sync && sum > 0) { document.getElementById('inputStoreCost').value = sum; calculatePerPerson(); }
+  return sum;
+}
+function setPrice(id, v) {
+  const p = getJSON(PRICE_KEY), n = parseFloat(v);
+  if (isFinite(n) && n > 0) p[id] = Math.round(n); else delete p[id];
+  lsSet(PRICE_KEY, JSON.stringify(p)); updateSubtotal(true);
+}
+function addCustom() {
+  const list = getCustom(), id = `cu_${currentStore}_${Date.now().toString(36)}`;
+  list.push({ id, name: '' }); setCustom(list); renderChecklist();
+  const inputs = document.querySelectorAll('#checklistContainer input[type=text]'); if (inputs.length) inputs[inputs.length - 1].focus();
+}
+function renameCustom(id, name) { const list = getCustom(); const it = list.find(x => x.id === id); if (it) { it.name = name.slice(0, 60); setCustom(list); } }
+function removeCustom(id) {
+  setCustom(getCustom().filter(x => x.id !== id));
+  const c = getStoredChecks(); delete c[id]; setStoredChecks(c);
+  const p = getJSON(PRICE_KEY); delete p[id]; lsSet(PRICE_KEY, JSON.stringify(p));
+  renderChecklist(); updateSubtotal(true);
+}
+function showStaffCard(id) {
+  let item = null; storePlans[currentStore].sections.forEach(s => s.items.forEach(i => { if (i.id === id) item = i; }));
+  if (!item) return;
+  document.getElementById('staffEmoji').textContent = EMOJI[id] || '🛒';
+  document.getElementById('staffZh').textContent = item.zh;
+  document.getElementById('staffLocal').textContent = lang === 'zh' ? '' : item[lang];
+  document.getElementById('staffClose').textContent = T().staff_close;
+  document.getElementById('staffCard').classList.remove('hidden');
+}
+function hideStaffCard() { document.getElementById('staffCard').classList.add('hidden'); }
 
 function toggleItem(id, v) { const c = getStoredChecks(); c[id] = v; setStoredChecks(c); renderChecklist(); }
 
 function resetCurrentList() {
   const c = getStoredChecks();
-  storePlans[currentStore].sections.forEach(s => s.items.forEach(i => delete c[i.id]));
+  allIds().forEach(i => delete c[i]);
   setStoredChecks(c); renderChecklist(); showToast(T().t_reset);
 }
 
