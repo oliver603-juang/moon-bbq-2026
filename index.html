@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>2026 中秋烤肉・福和橋下 4 人手冊</title>
+    <meta name="description" content="2026 Mid-Autumn BBQ guide under Fuhe Bridge — 中文 / English / Tiếng Việt">
+    <meta name="theme-color" content="#040814">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Moon BBQ">
+    <link rel="stylesheet" href="tailwind.css">
+    <style>
+        body { font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0A1124; }
+        ::-webkit-scrollbar-thumb { background: #233863; border-radius: 3px; }
+        .glow-banner { background: radial-gradient(circle at 50% 20%, rgba(245,158,11,.15) 0%, rgba(10,17,36,0) 70%); }
+    </style>
+</head>
+<body class="bg-night-950 text-slate-100 min-h-screen selection:bg-amber-500 selection:text-black">
+
+    <nav class="sticky top-0 z-40 backdrop-blur-md bg-night-950/90 border-b border-night-border px-4 py-3">
+        <div class="max-w-4xl mx-auto flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5 min-w-0">
+                <span class="text-2xl">🌕</span>
+                <div class="min-w-0">
+                    <h1 class="font-bold text-sm sm:text-base text-amber-300 leading-tight truncate" data-i18n="nav_title"></h1>
+                    <p class="text-[11px] text-slate-400 truncate" data-i18n="nav_sub"></p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <div class="flex p-0.5 rounded-full bg-slate-800 border border-slate-700 text-[11px] font-bold" role="group" aria-label="Language">
+                    <button id="lang_zh" onclick="setLang('zh')" class="px-2 py-1 rounded-full">中</button>
+                    <button id="lang_en" onclick="setLang('en')" class="px-2 py-1 rounded-full">EN</button>
+                    <button id="lang_vi" onclick="setLang('vi')" class="px-2 py-1 rounded-full">VI</button>
+                </div>
+                <button onclick="shareTrip()" class="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-amber-200 border border-amber-500/40 transition active:scale-95">
+                    <span>📤</span><span class="hidden sm:inline" data-i18n="share"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="relative px-4 pt-8 pb-10 border-b border-night-border glow-banner">
+        <div class="max-w-3xl mx-auto text-center space-y-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                🛡️ <span data-i18n="badge_official"></span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white">
+                <span data-i18n="hero_a"></span><span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-orange-400" data-i18n="hero_b"></span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed" data-i18n="hero_desc"></p>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 text-left text-xs max-w-2xl mx-auto">
+                <div class="bg-night-card border border-night-border p-3 rounded-xl">
+                    <div class="text-slate-400" data-i18n="k_origin"></div>
+                    <div class="font-bold text-amber-200 truncate">永貞路190號</div>
+                </div>
+                <div class="bg-night-card border border-night-border p-3 rounded-xl">
+                    <div class="text-slate-400" data-i18n="k_hours"></div>
+                    <div class="font-bold text-emerald-300">10:00 - 22:00</div>
+                </div>
+                <div class="bg-night-card border border-night-border p-3 rounded-xl">
+                    <div class="text-slate-400" data-i18n="k_entry"></div>
+                    <div class="font-bold text-amber-200 truncate" data-i18n="v_entry"></div>
+                </div>
+                <div class="bg-night-card border border-night-border p-3 rounded-xl">
+                    <div class="text-slate-400" data-i18n="k_rules"></div>
+                    <div class="font-bold text-amber-200" data-i18n="v_rules"></div>
+                </div>
+            </div>
+
+            <button id="installBtn" onclick="installApp()" class="hidden mx-auto px-4 py-2 rounded-full bg-amber-400 text-slate-950 text-xs font-bold active:scale-95">
+                📲 <span data-i18n="install"></span>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-8 space-y-10">
+
+        <section id="official-notice" class="space-y-4">
+            <div class="flex items-center gap-2">
+                <div class="w-2.5 h-6 bg-emerald-400 rounded-full"></div>
+                <h3 class="text-lg sm:text-xl font-bold text-white" data-i18n="sec_notice"></h3>
+            </div>
+            <div class="bg-gradient-to-br from-night-card to-night-800 border border-emerald-500/30 rounded-2xl p-5 space-y-4 shadow-lg">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-night-border pb-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" data-i18n="notice_tag"></span>
+                        <h4 class="font-bold text-white text-base" data-i18n="notice_name"></h4>
+                    </div>
+                    <span class="text-xs text-amber-300 font-medium">📅 <span data-i18n="notice_period"></span></span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div class="flex items-start gap-2.5 p-3 rounded-xl bg-night-900/80 border border-night-border">
+                        <span class="text-base">🗺️</span>
+                        <div><strong class="text-slate-200 block mb-0.5" data-i18n="n1_t"></strong><span class="text-slate-400 leading-relaxed" data-i18n-html="n1_d"></span></div>
+                    </div>
+                    <div class="flex items-start gap-2.5 p-3 rounded-xl bg-night-900/80 border border-night-border">
+                        <span class="text-base">🔥</span>
+                        <div><strong class="text-slate-200 block mb-0.5" data-i18n="n2_t"></strong><span class="text-slate-400 leading-relaxed" data-i18n-html="n2_d"></span></div>
+                    </div>
+                    <div class="flex items-start gap-2.5 p-3 rounded-xl bg-night-900/80 border border-night-border">
+                        <span class="text-base">🚰</span>
+                        <div><strong class="text-slate-200 block mb-0.5" data-i18n="n3_t"></strong><span class="text-slate-400 leading-relaxed" data-i18n-html="n3_d"></span></div>
+                    </div>
+                    <div class="flex items-start gap-2.5 p-3 rounded-xl bg-night-900/80 border border-night-border">
+                        <span class="text-base">⏰</span>
+                        <div><strong class="text-slate-200 block mb-0.5" data-i18n="n4_t"></strong><span class="text-slate-400 leading-relaxed" data-i18n-html="n4_d"></span></div>
+                    </div>
+                </div>
+                <p class="text-[11px] text-slate-500" data-i18n="notice_disclaimer"></p>
+            </div>
+        </section>
+
+        <section id="shopping-plan" class="space-y-4">
+            <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                    <div class="w-2.5 h-6 bg-amber-400 rounded-full shrink-0"></div>
+                    <h3 class="text-lg sm:text-xl font-bold text-white" data-i18n="sec_shop"></h3>
+                </div>
+                <button onclick="resetCurrentList()" class="shrink-0 text-xs text-slate-400 hover:text-amber-400 underline">↻ <span data-i18n="reset"></span></button>
+            </div>
+
+            <div class="grid grid-cols-2 p-1.5 bg-night-card border border-night-border rounded-2xl">
+                <button id="tabPxmart" onclick="switchStore('pxmart')">🧺 <span data-i18n="tabA"></span></button>
+                <button id="tabCarrefour" onclick="switchStore('carrefour')">🛒 <span data-i18n="tabB"></span></button>
+            </div>
+
+            <div class="bg-night-card border border-night-border rounded-2xl p-4 sm:p-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-night-border pb-3">
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span id="storeBadge"></span>
+                            <h4 id="storeName" class="text-base sm:text-lg font-bold text-slate-100"></h4>
+                        </div>
+                        <p id="storeAdvantage" class="text-xs text-slate-400 mt-1"></p>
+                    </div>
+                    <div class="sm:text-right shrink-0">
+                        <span class="text-xs text-slate-400" data-i18n="progress_label"></span>
+                        <div id="progressPercent" class="text-sm font-bold text-amber-300">0%</div>
+                    </div>
+                </div>
+                <div class="w-full bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
+                    <div id="progressBar" class="bg-gradient-to-r from-amber-500 to-yellow-400 h-full w-0 transition-all duration-300"></div>
+                </div>
+                <p id="zhHint" class="text-[11px] text-slate-500 mt-3" data-i18n="zh_hint"></p>
+                <div id="checklistContainer" class="mt-4 space-y-5"></div>
+            </div>
+        </section>
+
+        <section id="navigation" class="space-y-4">
+            <div class="flex items-center gap-2">
+                <div class="w-2.5 h-6 bg-cyan-400 rounded-full"></div>
+                <h3 class="text-lg sm:text-xl font-bold text-white" data-i18n="sec_nav"></h3>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-400" data-i18n="nav_desc"></p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-night-card border border-night-border rounded-2xl p-4 sm:p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30" data-i18n="leg1"></span>
+                        <span class="text-xs text-slate-400" data-i18n="leg1_time"></span>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-100 text-sm sm:text-base">永貞路190號 ➔ <span id="leg1DestTitle"></span></h4>
+                        <p class="text-xs text-slate-400 mt-0.5" data-i18n="leg1_desc"></p>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 pt-2">
+                        <a id="navLeg1Bike" href="#" target="_blank" rel="noopener" class="navbtn flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 transition active:scale-95 text-center"><span class="text-base mb-1">🚲</span><span class="text-[11px] font-semibold" data-i18n="bike"></span></a>
+                        <a id="navLeg1Transit" href="#" target="_blank" rel="noopener" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 transition active:scale-95 text-center"><span class="text-base mb-1">🚌</span><span class="text-[11px] font-semibold" data-i18n="bus"></span></a>
+                        <a id="navLeg1Walk" href="#" target="_blank" rel="noopener" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 transition active:scale-95 text-center"><span class="text-base mb-1">🚶</span><span class="text-[11px] font-semibold" data-i18n="walk"></span></a>
+                    </div>
+                </div>
+
+                <div class="bg-night-card border border-night-border rounded-2xl p-4 sm:p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" data-i18n="leg2"></span>
+                        <span class="text-xs text-slate-400" data-i18n="leg2_time"></span>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-100 text-sm sm:text-base"><span id="leg2OriginTitle"></span> ➔ <span data-i18n="leg2_dest"></span></h4>
+                        <p class="text-xs text-slate-400 mt-0.5" data-i18n="leg2_desc"></p>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 pt-2">
+                        <a id="navLeg2Bike" href="#" target="_blank" rel="noopener" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 transition active:scale-95 text-center"><span class="text-base mb-1">🚲</span><span class="text-[11px] font-semibold" data-i18n="bike"></span></a>
+                        <a id="navLeg2Transit" href="#" target="_blank" rel="noopener" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 transition active:scale-95 text-center"><span class="text-base mb-1">🚌</span><span class="text-[11px] font-semibold" data-i18n="transit"></span></a>
+                        <a id="navLeg2Walk" href="#" target="_blank" rel="noopener" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 transition active:scale-95 text-center"><span class="text-base mb-1">🚶</span><span class="text-[11px] font-semibold" data-i18n="walk"></span></a>
+                    </div>
+                </div>
+            </div>
+            <p class="text-[11px] text-slate-500" data-i18n="bike_note"></p>
+        </section>
+
+        <section id="schedule" class="space-y-4">
+            <div class="flex items-center gap-2">
+                <div class="w-2.5 h-6 bg-orange-400 rounded-full"></div>
+                <h3 class="text-lg sm:text-xl font-bold text-white" data-i18n="sec_sched"></h3>
+            </div>
+            <div id="scheduleBox" class="bg-night-card border border-night-border rounded-2xl p-5 space-y-4"></div>
+        </section>
+
+        <section id="split-bill" class="space-y-4">
+            <div class="flex items-center gap-2">
+                <div class="w-2.5 h-6 bg-pink-500 rounded-full"></div>
+                <h3 class="text-lg sm:text-xl font-bold text-white" data-i18n="sec_bill"></h3>
+            </div>
+            <div class="bg-night-card border border-night-border rounded-2xl p-5 space-y-4">
+                <p class="text-xs text-slate-300" data-i18n="bill_desc"></p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="inputStoreCost" class="block text-xs font-semibold text-amber-300 mb-1" id="billStoreLabel"></label>
+                        <div class="relative">
+                            <span class="absolute left-3.5 top-2.5 text-slate-400 text-sm">$</span>
+                            <input type="number" inputmode="numeric" min="0" id="inputStoreCost" value="2380" oninput="calculatePerPerson()" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 pl-8 pr-3 text-white text-sm focus:outline-none focus:border-amber-400">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="inputExtraCost" class="block text-xs font-semibold text-slate-300 mb-1" data-i18n="bill_extra"></label>
+                        <div class="relative">
+                            <span class="absolute left-3.5 top-2.5 text-slate-400 text-sm">$</span>
+                            <input type="number" inputmode="numeric" min="0" id="inputExtraCost" value="0" oninput="calculatePerPerson()" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 pl-8 pr-3 text-white text-sm focus:outline-none focus:border-amber-400">
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-900/90 border border-night-border flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="text-center sm:text-left">
+                        <span class="text-xs text-slate-400" data-i18n="total"></span>
+                        <div id="displayTotalBill" class="text-2xl font-black text-white">$ 0</div>
+                    </div>
+                    <div class="h-8 w-px bg-slate-800 hidden sm:block"></div>
+                    <div class="text-center sm:text-left">
+                        <span class="text-xs text-amber-400 font-bold" data-i18n="per"></span>
+                        <div class="text-2xl font-black text-amber-300"><span id="displayPerPerson">$ 0</span> <span class="text-xs font-normal text-slate-400" data-i18n="per_unit"></span></div>
+                    </div>
+                    <button onclick="copyLineBillMessage()" class="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition active:scale-95 shadow-md">
+                        📋 <span data-i18n="copy_btn"></span>
+                    </button>
+                </div>
+                <p id="roundNote" class="text-[11px] text-slate-500"></p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-8 border-t border-night-border text-center text-xs text-slate-500 space-y-1 px-4">
+        <p data-i18n="foot1"></p>
+        <p data-i18n="foot2"></p>
+    </footer>
+
+    <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-950 px-4 py-2 rounded-full text-xs font-bold shadow-2xl opacity-0 pointer-events-none transition-all duration-300 z-50 max-w-[90vw] text-center">
+        ✅ <span id="toastText"></span>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

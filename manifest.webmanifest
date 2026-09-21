@@ -1,0 +1,16 @@
+{
+  "name": "2026 中秋烤肉手冊 · Moon BBQ Guide",
+  "short_name": "Moon BBQ",
+  "description": "2026 Mid-Autumn BBQ guide under Fuhe Bridge (中文 / English / Tiếng Việt)",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#040814",
+  "theme_color": "#040814",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
